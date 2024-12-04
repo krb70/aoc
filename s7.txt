@@ -1,0 +1,22 @@
+import sys, collections
+cwd = root = {}
+for line in sys.stdin.readlines():
+    if line[:4] == '$ cd':
+       if (fld:=line.split()[-1]) != '..':
+           cwd.setdefault(fld, {})['..'] = cwd
+       cwd = root if fld == '/' else cwd[fld]
+    elif line[:4] not in('$ ls', 'dir '):
+       cwd[p[1]] = int((p:=line.split())[0])
+
+def sizes(fld, n='/', p=None):
+    p = collections.defaultdict(int) if p is None else p
+    for k, v in filter(lambda x: x[0]!='..',fld.items()):
+       leaf = isinstance(v, int)
+       p[n], p[n+k] = (v+p[n],v) if leaf else (p[n]+sizes(v,f'{n}{k}/',p)[0], p[n+k])
+    return p[n], p
+
+tot, sizes = sizes(root)
+
+print(sum(v for k,v in sizes.items() if k.endswith('/') and v <= 100_000))
+print(min(v for k,v in sizes.items() if k.endswith('/') and 70_000_000-tot+v >= 30_000_000))
+
