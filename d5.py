@@ -3,9 +3,9 @@ from functools import cmp_to_key as K
 from itertools import combinations as C
 
 p = plb.Path((sys.argv+['d5.txt'])[1]).read_text().strip().split('\n\n')
-rtxt, ptxt = [x.split('\n') for x in p]
-b4 = {tuple(int(x) for x in line.split('|')) for line in rtxt}
-upd = [[int(x) for x in line.split(',')] for line in ptxt]
+rls, pr = [x.split('\n') for x in p]
+b4 = {tuple(int(x) for x in line.split('|')) for line in rls}
+upd = [[int(v) for v in ln.split(',')] for ln in pr]
 
 bad = lambda pn: any((b,a) in b4 for a,b in C(pn, 2))
 
