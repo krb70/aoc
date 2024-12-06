@@ -1,34 +1,27 @@
 import sys as S, pathlib as P, itertools as I, collections as C
 
-grid = list(map(list,P.Path((S.argv+['d6.txt'])[1]).read_text().strip().split('\n')))
-R, X, Y, *stepd = range, len(grid), len(grid[0]), -1, 1j, 1, -1j
+grid = P.Path((S.argv+['d6.txt'])[1]).read_text().strip().split('\n')
+R, X, Y = range, len(grid), len(grid[0])
 G = lambda: I.starmap(complex, I.product(R(X), R(Y)))
-_atpos=lambda p:0<=(i:=int(p.real))<X and 0<=(j:=int(p.imag))<Y and grid[i][j] or ''
-atpos = C.defaultdict(str, {p:_atpos(p) for p in G()})
-nxt=lambda p,d: p+stepd[d]
-put = atpos.__setitem__
+loc = C.defaultdict(str, {p:grid[int(p.real)][int(p.imag)] for p in G()})
+put = loc.__setitem__
 
-start = next(filter(lambda p: atpos[p]=='^', G()))
+start = next(filter(lambda p: loc[p]=='^', G()))
 
 def walk(pos, d):
-    vs, loop = [pos], set()
-    while True:
-        if pos != vs[-1]: vs.append(pos)
-        match atpos[n:=nxt(pos,d)]:
-            case '': break
-            case '#':
-                d = (d+1)%4  # right turn
-                # detect loops at each turn position
-                if (pos,d) in loop: return
-                loop.add((pos,d))
-            case _: pos = n
+    vs, loop = [pos], C.Counter()
+    while v:=loc[n:=pos+d]:
+        if v == '#': # detect loops at each turn position
+            d *= -1j  # right turn
+            if loop.update({(pd:=(pos,d)):1}) or loop[pd]>1: return
+        else: pos, _ = n, vs.append(n)
     return vs
 
-route = walk(start, 0)
-print(len(set(route)))
+rt = walk(start, -1)
+print(len(set(rt)))
 
-def walk2(pos, d, ad):
-    return (put(ad, '#'), walk(pos, d), put(ad, '.'))[1]
+walk2 = lambda pos, d, ad: (put(ad, '#'), walk(pos, d), put(ad, '.'))[1]
 
-print(sum(1 for p in set(route)-{start} if atpos[p]=='.' and not walk2(start, 0, p)))
+cand = {p2:p1 for p1,p2 in reversed(list(I.pairwise(rt))) if p1!=p2}
+print(sum(1 for p2, p1 in cand.items() if p2!=start and not walk2(p1, p2-p1, p2)))
 
