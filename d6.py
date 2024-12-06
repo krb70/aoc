@@ -5,27 +5,30 @@ R, X, Y, *stepd = range, len(grid), len(grid[0]), -1, 1j, 1, -1j
 G = lambda: I.starmap(complex, I.product(R(X), R(Y)))
 
 atpos=lambda p:0<=(i:=int(p.real))<X and 0<=(j:=int(p.imag))<Y and grid[i][j] or ''
-
+nxt=lambda p,d: p+stepd[d]
 def put(p, c): grid[int(p.real)][int(p.imag)] = c
 
 start = next(filter(lambda p: atpos(p)=='^', G()))
 
 def walk(pos, d):
-    vs, loop = [], set()
+    vs, loop = [pos], set()
     while True:
-        if (pos, d) in loop: return vs, True
-        vs.append(pos); loop.add((pos, d))
-        match atpos(pos+stepd[d]):
+        if pos != vs[-1]: vs.append(pos)
+        match atpos(n:=nxt(pos,d)):
             case '': break
-            case '#': d = (d+1)%4  # right turn
-            case _: pos = pos+stepd[d]
-    return vs, False
+            case '#':
+                d = (d+1)%4  # right turn
+                # detect loops at each turn position
+                if (pos,d) in loop: return
+                loop.add((pos,d))
+            case _: pos = n
+    return vs
 
-route = walk(start, 0)[0]
+route = walk(start, 0)
 print(len(set(route)))
 
 def walk2(pos, d, ad):
     return (put(ad, '#'), walk(pos, d), put(ad, '.'))[1]
 
-print(sum(1 for p in G() if atpos(p) == '.' and walk2(start, 0, p)[1]))
+print(sum(1 for p in set(route)-{start} if atpos(p)=='.' and not walk2(start, 0, p)))
 
