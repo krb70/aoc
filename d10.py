@@ -15,6 +15,6 @@ def search(p):
 
 for h in heads: search(h)
 # endpoints
-print(sum(len(set(x[-1] for x in paths.get(h, {}))) for h in heads))
+print(sum(len(set(x[-1] for x in paths[h])) for h in heads))
 # paths
-print(sum(len(paths.get(h, {})) for h in heads))
+print(sum(len(paths[h]) for h in heads))
