@@ -19,5 +19,7 @@ middle = lambda ps: [p for p in ps if (X/4<=p.real<=3*X/4) if (Y/4<=p.imag<=3*Y/
 # find when most robots are in the middle of the space
 for s in range(100, 10000):
     mid = middle((pos(r,s) for r in rb))
-    if len(mid) > len(rb)/2:
+    if len(mid) > .7*len(rb):
         print(s)
+        print('\n'.join(ln.rstrip() for y in range(Y) if (ln:=''.join('*' if C(x,y) in mid else ' ' for x in range(X)))
+               if len(ln.replace(' ',''))>3))
