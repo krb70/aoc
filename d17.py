@@ -22,11 +22,7 @@ def run(A,B,C,prog):
 print(','.join(map(str,run(A,B,C,prog))))
 
 def bestA(prog):
-    t=0
-    def v0(A):
-        nonlocal t
-        print(t:=t+1, oct(A)[2:])
-        return run(A,0,0,prog)[0]  # run the program, return first value
+    v0 = lambda A: run(A,0,0,prog)[0]  # run the program, return first value
     A_=lambda p,d='': int(p+str(d),8) # concat p and d as octals
     match=lambda p,d: (str(i) for i in range(8) if v0(A_(p,i))==d) # good digits to add
     first=lambda it: next(filter(None, it), 0)  # first truthy value of an iterable

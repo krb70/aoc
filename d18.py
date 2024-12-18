@@ -1,4 +1,4 @@
-import sys as S, pathlib as P
+import sys as S, pathlib as P, collections as O
 C=complex
 txt = P.Path((S.argv+['d18.txt'])[1]).read_text().strip().split('\n')
 S,N=71,1024
@@ -7,10 +7,10 @@ if len(txt)<100:
 bts = [C(*map(int,ln.split(','))) for ln in txt]
 
 def search(n):
-    q=[(C(0),)]
+    q=O.deque([(C(0),)])
     G, good, seen=set(bts[:n]), [], set()
     while q:
-        rt = q.pop(0)
+        rt = q.popleft()
         if (pos:=rt[-1]) == C(S-1,S-1):
             good.append(rt)
             continue
