@@ -1,12 +1,6 @@
-import sys as S, pathlib as P, functools as F
+import sys as S, pathlib as P, functools as F, re
 tw,pats = P.Path((S.argv+['d19.txt'])[1]).read_text().strip().split('\n\n')
-tw = [_.strip() for _ in tw.split(',')]
-pats = [_.strip() for _ in pats.split('\n')]
+tw,sw = re.findall(r'\w+',tw), str.startswith
 
-@F.cache 
-def search(pat):
-    return not pat and 1 or sum(search(pat[len(t):]) for t in tw if pat.startswith(t))
-
-sols = [s for pat in pats if (s:=search(pat))]
-print(len(sols))
-print(sum(sols))
+find = F.cache(lambda p:sum(find(p[len(t):]) for t in tw if sw(p,t)) if p else 1)
+print(len(sols:=list(filter(None,map(find,pats.split())))),sum(sols),sep='\n')
