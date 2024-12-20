@@ -1,33 +1,23 @@
 import sys as S, pathlib as P, itertools as I, collections as O
 C,R,d=complex,range,{1j**n for n in range(4)}
-
 txt = P.Path((S.argv+['d20.txt'])[1]).read_text().strip().split('\n')
-G = {C(x,y):c for x,y in I.product(R(len(txt[0])),R(len(txt))) if (c:=txt[y][x]) in '.SE'}
-S,E = [p for k in 'SE' for p,v in G.items() if v==k]
-assert G[S] == 'S' and G[E] == 'E' and all(G[k]=='.' for k in G if k not in [S,E])
-p=S
-
-def show():
-    for y in R(len(txt)):
-       ln = ''.join(str(G.get(C(x,y),'#'))[-1] for x in R(len(txt[0])))
-       print(ln)
-    print()
+X,Y=len(txt[0]),len(txt)
+G = {C(x,y):c for x,y in I.product(R(X),R(Y)) if (c:=txt[y][x]) in '.SE'}
+N, p = len(G), next(p for p,v in G.items() if v=='S')
 
 for i in R(len(G)):
     G[p],p=i,p+next((k for k in d if str(G.get(p+k,'#')) in '.E'),0)
-
 iG = {v:k for k,v in G.items()}
 
-assert iG[0] == S and iG[len(G)-1] == E
-def cheats():
-    for i in R(len(G)):
-        s1 = [p for k in d if (p:=iG[i]+k) not in G]
-        for _1 in s1:
-            s2 = [p for k in d if (p:=_1+k) in G and p!=iG[i]]
-            for _2 in s2:
-                score = G[_2]-G[iG[i]] - 2
-                if score > 0:
-                    yield ((_1, _2), score)
+md = lambda a,b: int(abs(a.real-b.real)) + int(abs(a.imag-b.imag))
 
-print(sum(1 for (_1, _2), s in cheats() if s>=100))
+def ncheats(steps=2, goal=100):
+    cp = set()
+    nbrs = set(filter(lambda x:md(C(*x),0j)<=steps, I.product(R(-steps,steps+1),R(-steps, steps+1))))
+    for p,(dx, dy) in I.product(R(N-goal), nbrs):
+       if (_2:=(_1:=iG[p])+C(dx,dy)) in G:
+           if G[_2]-G[_1]-abs(dx)-abs(dy) >= goal: cp.add((_1,_2))
+    return len(cp) 
 
+print(ncheats(2))
+print(ncheats(20))
