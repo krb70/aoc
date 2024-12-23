@@ -3,7 +3,7 @@ C,EN,R,T,PW=complex,enumerate,range,tuple,I.pairwise
 codes = P.Path((S.argv+['d21.txt'])[1]).read_text().strip().split()
 pads = ["789 456 123 _0A".split(), "_^A <v>".split()]
 k2p = [{c:C(x,y) for x,r in EN(pad) for y,c in EN(r)} for pad in pads]
-ok = lambda a,b,c:a.real+b.imag!=c  # stays on keypad? i.e no '_'?
+ok = lambda a,b,c:a.real+b.imag*1j!=c  # stays on keypad? i.e no '_'?
 ri = lambda x:(int(x.real),int(x.imag))
 maybe = lambda p,v: p and {v} or set()
 
